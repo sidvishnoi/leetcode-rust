@@ -2,30 +2,40 @@ struct Solution;
 
 use std::collections::HashMap;
 
-type Memo = HashMap<usize, Vec<String>>;
+type Memo<'a> = HashMap<usize, Vec<Vec<&'a str>>>;
 impl Solution {
     pub fn word_break(s: String, word_dict: Vec<String>) -> Vec<String> {
         let mut memo: Memo = HashMap::new();
-        Self::dfs(&s, 0, &word_dict, &mut memo)
+        let broken_words = Self::dfs(&s, 0, &word_dict, &mut memo);
+        broken_words
+            .into_iter()
+            .map(|mut words| {
+                words.reverse();
+                words.join(" ")
+            })
+            .collect()
     }
 
-    fn dfs(s: &str, start: usize, dict: &Vec<String>, memo: &mut Memo) -> Vec<String> {
+    fn dfs<'a>(
+        s: &str,
+        start: usize,
+        dict: &'a Vec<String>,
+        memo: &mut Memo<'a>,
+    ) -> Vec<Vec<&'a str>> {
         if let Some(words) = memo.get(&start) {
-            return words.to_vec();
+            return words.clone();
         }
-
-        let mut words = Vec::new();
         if start == s.len() {
-            words.push("".to_string());
-            return words;
+            return vec![vec![]];
         }
 
+        let mut words: Vec<Vec<&'a str>> = Vec::new();
         let current = &s[start..];
         for word in dict {
             if current.starts_with(word) {
-                for suffix in Self::dfs(s, start + word.len(), dict, memo) {
-                    let connector = if suffix.is_empty() { "" } else { " " };
-                    words.push(format!("{}{}{}", word, connector, suffix));
+                for mut suffix in Self::dfs(s, start + word.len(), dict, memo) {
+                    suffix.push(word);
+                    words.push(suffix);
                 }
             }
         }
