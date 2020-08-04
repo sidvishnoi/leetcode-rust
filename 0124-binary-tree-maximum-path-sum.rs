@@ -16,11 +16,8 @@ impl Solution {
         match root {
             None => 0,
             Some(ref r) => {
-                let left_node = r.borrow().left.as_ref().map_or(None, |x| Some(x.clone()));
-                let right_node = r.borrow().right.as_ref().map_or(None, |x| Some(x.clone()));
-
-                let left_max = Self::helper(left_node, result);
-                let right_max = Self::helper(right_node, result);
+                let left_max = Self::helper(r.borrow().left.clone(), result);
+                let right_max = Self::helper(r.borrow().right.clone(), result);
                 let root_val = r.borrow().val;
 
                 *result = std::cmp::max(*result, root_val + left_max + right_max);
