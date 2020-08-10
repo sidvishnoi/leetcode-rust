@@ -2,11 +2,9 @@ struct Solution;
 
 impl Solution {
     pub fn title_to_number(s: String) -> i32 {
-        let mut number = 0;
-        for ch in s.chars() {
-            number = (number * 26) + (ch as u8 - b'A' + 1) as i32;
-        }
-        number
+        s.into_bytes()
+            .into_iter()
+            .fold(0, |num, ch| (num * 26) + (ch - b'A' + 1) as i32)
     }
 }
 
