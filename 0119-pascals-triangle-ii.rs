@@ -2,12 +2,14 @@ struct Solution;
 
 impl Solution {
     pub fn get_row(row_index: i32) -> Vec<i32> {
-        let mut row = Vec::with_capacity((row_index + 1) as usize);
-        let mut num: i64 = 1;
-        let row_index = row_index as i64;
-        for j in 0..=row_index {
-            row.push(num as i32);
-            num = num * (row_index - j) / (j + 1);
+        let row_index = row_index as usize;
+
+        let mut row = vec![0; row_index + 1];
+        row[0] = 1;
+        for i in 1..=row_index {
+            for j in (1..=i).rev() {
+                row[j] += row[j - 1]
+            }
         }
         row
     }
