@@ -2,9 +2,9 @@ struct Solution;
 
 impl Solution {
     pub fn longest_palindrome(s: String) -> i32 {
-        let mut counts = [0; 128];
+        let mut counts = [0; 64];
         for ch in s.into_bytes() {
-            counts[ch as usize] += 1;
+            counts[(ch - b'A') as usize] += 1;
         }
         let mut longest_palindrome_length = 0;
         for count in counts.iter() {
