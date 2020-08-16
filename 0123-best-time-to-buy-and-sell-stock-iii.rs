@@ -23,11 +23,11 @@ impl Solution {
         //     // ...which is same as: subtracting min of (prices[j] + profits[k-1][j-1]) from prices[i]
         //     // also, we can avoid repeating calculation of min above.
         // )
-        for k in 1..=max_transactions {
-            let mut min = prices[0];
-            for i in 1..prices.len() {
-                min = cmp::min(min, prices[i] - profits[k - 1][i - 1]);
-                profits[k][i] = cmp::max(profits[k][i - 1], prices[i] - min);
+        let mut min = vec![prices[0]; max_transactions + 1];
+        for i in 1..prices.len() {
+            for k in 1..=max_transactions {
+                min[k] = cmp::min(min[k], prices[i] - profits[k - 1][i - 1]);
+                profits[k][i] = cmp::max(profits[k][i - 1], prices[i] - min[k]);
             }
         }
 
