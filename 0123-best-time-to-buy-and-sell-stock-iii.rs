@@ -3,7 +3,7 @@ struct Solution;
 use std::cmp;
 // With k = max_transactions and n = number of days (length of prices)
 // Time: O(kn)
-// Space: O(kn)
+// Space: O(k)
 impl Solution {
     pub fn max_profit(prices: Vec<i32>) -> i32 {
         if prices.is_empty() {
@@ -13,7 +13,9 @@ impl Solution {
         let max_transactions: usize = 2;
 
         // profits[k][i] = profit with k transactions until i'th day.
-        let mut profits = vec![vec![0; prices.len()]; max_transactions + 1];
+        // Optimization: As the profit for a day only depends on previous day,
+        // we don't need to store profit for all days.
+        let mut profits = vec![0; max_transactions + 1];
 
         // profits[k][i] = max(
         //     // if we don't trade, profit is same as previous day:
@@ -26,12 +28,12 @@ impl Solution {
         let mut min = vec![prices[0]; max_transactions + 1];
         for i in 1..prices.len() {
             for k in 1..=max_transactions {
-                min[k] = cmp::min(min[k], prices[i] - profits[k - 1][i - 1]);
-                profits[k][i] = cmp::max(profits[k][i - 1], prices[i] - min[k]);
+                min[k] = cmp::min(min[k], prices[i] - profits[k - 1]);
+                profits[k] = cmp::max(profits[k], prices[i] - min[k]);
             }
         }
 
-        profits[max_transactions][prices.len() - 1]
+        profits[max_transactions]
     }
 }
 
