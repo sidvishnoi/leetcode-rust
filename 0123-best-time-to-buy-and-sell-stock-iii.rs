@@ -1,21 +1,21 @@
 struct Solution;
 
-use std::cmp::max;
+use std::cmp::{max, min};
 // Time: O(n)
 // Space: O(1)
 impl Solution {
     pub fn max_profit(prices: Vec<i32>) -> i32 {
-        let mut one_buy = std::i32::MIN;
-        let mut one_buy_one_sell = 0;
-        let mut two_buy = std::i32::MIN;
-        let mut two_buy_two_sell = 0;
+        let mut min_cost_one_buy = std::i32::MAX;
+        let mut max_profit_one_sell = 0;
+        let mut min_cost_two_buy = std::i32::MAX;
+        let mut max_profit_two_sell = 0;
         for price in prices {
-            one_buy = max(one_buy, -price);
-            one_buy_one_sell = max(one_buy_one_sell, price + one_buy);
-            two_buy = max(two_buy, one_buy_one_sell - price);
-            two_buy_two_sell = max(two_buy_two_sell, two_buy + price);
+            min_cost_one_buy = min(min_cost_one_buy, price);
+            max_profit_one_sell = max(max_profit_one_sell, price - min_cost_one_buy);
+            min_cost_two_buy = min(min_cost_two_buy, price - max_profit_one_sell);
+            max_profit_two_sell = max(max_profit_two_sell, price - min_cost_two_buy);
         }
-        two_buy_two_sell
+        max_profit_two_sell
     }
 }
 
