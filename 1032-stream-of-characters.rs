@@ -1,10 +1,10 @@
 use std::cell::RefCell;
-use std::collections::VecDeque;
+use std::collections::{HashMap, VecDeque};
 
 #[derive(Default)]
 struct TrieNode {
     is_word: bool,
-    children: [Option<Box<TrieNode>>; 26],
+    children: HashMap<u8, Box<TrieNode>>,
 }
 
 impl TrieNode {
@@ -14,9 +14,8 @@ impl TrieNode {
 
     fn insert(&mut self, word: Vec<u8>) {
         let mut curr = self;
-        for ch in word.into_iter().map(|ch| (ch - b'a') as usize) {
-            let children = &mut curr.children[ch];
-            curr = children.get_or_insert_with(|| Box::new(TrieNode::new()))
+        for ch in word.into_iter() {
+            curr = curr.children.entry(ch).or_default();
         }
         curr.is_word = true;
     }
@@ -54,11 +53,11 @@ impl StreamChecker {
         }
 
         let mut curr = &self.trie;
-        for &ch in self.last_queried.borrow().iter().rev() {
-            curr = match &curr.children[(ch - b'a') as usize] {
+        for ch in self.last_queried.borrow().iter().rev() {
+            curr = match &curr.children.get(ch) {
                 Some(trie) if trie.is_word => return true,
                 Some(trie) => trie,
-                None => break,
+                None => return false,
             };
         }
         false
