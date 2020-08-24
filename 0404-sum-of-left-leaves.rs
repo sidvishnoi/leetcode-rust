@@ -7,20 +7,24 @@ use std::rc::Rc;
 struct Solution;
 impl Solution {
     pub fn sum_of_left_leaves(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        if root.is_none() {
-            return 0;
-        }
-        let mut sum = 0;
-        if let Some(ref left) = root.as_ref().unwrap().borrow().left {
-            if left.borrow().left.is_none() && left.borrow().right.is_none() {
-                sum += left.borrow().val;
-            } else {
-                sum += Self::sum_of_left_leaves(Some(left.clone()));
-            }
-        }
-        sum += Self::sum_of_left_leaves(root.unwrap().borrow().right.clone());
+        Self::helper(root, false)
+    }
 
-        sum
+    fn helper(root: Option<Rc<RefCell<TreeNode>>>, is_left: bool) -> i32 {
+        match root {
+            Some(ref r) => {
+                let left = r.borrow().left.clone();
+                let right = r.borrow().right.clone();
+                if left.is_none() && right.is_none() {
+                    return match is_left {
+                        true => r.borrow().val,
+                        false => 0,
+                    };
+                }
+                Self::helper(left, true) + Self::helper(right, false)
+            }
+            None => 0,
+        }
     }
 }
 
