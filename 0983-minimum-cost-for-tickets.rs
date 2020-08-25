@@ -1,35 +1,31 @@
 struct Solution;
 
+macro_rules! min {
+    ($x: expr) => ($x);
+    ($x: expr, $($z: expr),+) => (::std::cmp::min($x, min!($($z),*)));
+}
+
 impl Solution {
-    pub fn mincost_tickets(days: Vec<i32>, costs: Vec<i32>) -> i32 {
-        let passes = [(1, costs[0]), (7, costs[1]), (30, costs[2])];
-        let mut memo = vec![-1; days.len()];
-        Self::find_cost(0, &days, &passes, &mut memo)
-    }
+    pub fn mincost_tickets(travel_days: Vec<i32>, costs: Vec<i32>) -> i32 {
+        let (cost_day, cost_week, cost_month) = (costs[0], costs[1], costs[2]);
 
-    fn find_cost(
-        day: usize,
-        days: &Vec<i32>,
-        passes: &[(i32, i32); 3],
-        memo: &mut Vec<i32>,
-    ) -> i32 {
-        if day >= days.len() {
-            return 0;
-        }
-        if memo[day] != -1 {
-            return memo[day];
-        }
-
-        let mut result = std::i32::MAX;
-        let mut d = day;
-        for (validity_duration, pass_cost) in passes {
-            while d < days.len() && days[d] < days[day] + validity_duration {
-                d += 1;
+        let mut dp = vec![0; travel_days.len() + 1];
+        let mut week = travel_days.len() - 1;
+        let mut month = travel_days.len() - 1;
+        for day in (0..travel_days.len()).rev() {
+            while travel_days[week] - travel_days[day] >= 7 {
+                week -= 1;
             }
-            result = std::cmp::min(result, Self::find_cost(d, days, passes, memo) + pass_cost);
+            while travel_days[month] - travel_days[day] >= 30 {
+                month -= 1;
+            }
+            dp[day] = min!(
+                cost_day + dp[day + 1],
+                cost_week + dp[week + 1],
+                cost_month + dp[month + 1]
+            );
         }
-        memo[day] = result;
-        result
+        dp[0]
     }
 }
 
